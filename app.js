@@ -2,32 +2,15 @@
 var express     = require('express'),
     app         = express(),
     bodyParser  = require('body-parser'),
-    mongoose    = require('mongoose');
+    mongoose    = require('mongoose'),
+    Campground  = require('./models/campground'),
+    seedDB      = require('./seeds');
 
+seedDB();
 mongoose.connect('mongodb://localhost/yelp_camp');
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 
-//Setup Schema
-var campgroundSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String
-});
-
-var Campground = mongoose.model("Campground", campgroundSchema);
-
-// Campground.create({
-//     name: "Cloud's Rest",
-//     image: "https://farm3.staticflickr.com/2259/2182093741_164dc44a24.jpg",
-//     description: "This is a huge camp site with lots of trees."
-// }, function(err, campground){
-//     if(err){
-//         console.log(err);
-//     } else {
-//         console.log(campground);
-//     }
-// });
 
 //Landing page
 app.get('/', function(req, res){
@@ -46,6 +29,7 @@ app.get('/campgrounds', function(req, res){
     });
 });
 
+//Create route
 app.post('/campgrounds', function(req, res){
     //get data from the form and update the campgrounds array
     var name = req.body.name;
@@ -64,13 +48,15 @@ app.post('/campgrounds', function(req, res){
 
 });
 
+//New route
 app.get('/campgrounds/new', function(req, res){
     res.render('new.ejs');
 });
 
+//Show route
 app.get('/campgrounds/:id', function(req, res){
 
-    Campground.findById(req.params.id, function(err, foundCampground){
+    Campground.findById(req.params.id).populate('comments').exec( function(err, foundCampground){
         if(err){
             console.log(err);
         } else{
