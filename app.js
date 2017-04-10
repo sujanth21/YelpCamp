@@ -28,6 +28,8 @@ app.set('view engine', 'ejs');
 app.use(methodOverride('_method'));
 app.use(flash());
 
+app.locals.moment = require('moment');
+
 //Passport Configuration
 app.use(session({
     secret: 'Once again Rusty wins cutest dog!',
